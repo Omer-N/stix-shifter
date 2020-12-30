@@ -39,7 +39,7 @@ class APIClient():
         data = {'username': auth['username'], 'password': auth['password'], 'output_mode': 'json'}
         endpoint = self.endpoint_start + 'auth/login'
         try:
-            response_json = json.load(self.client.call_api(endpoint, 'POST', headers, data=data, timeout=self.timeout))
+            response_json = json.load(self.client.call_api(endpoint, 'POST', headers, urldata=data, timeout=self.timeout))
             headers['Authorization'] = "Splunk " + response_json['sessionKey']
         except KeyError as e:
             raise Exception('Authentication error occured while getting auth token: ' + str(e))
@@ -48,7 +48,7 @@ class APIClient():
         self.authenticate()
         endpoint = self.endpoint_start + 'server/status'
         data = {'output_mode': self.output_mode}
-        return self.client.call_api(endpoint, 'GET', data=data, timeout=self.timeout)
+        return self.client.call_api(endpoint, 'GET', urldata=data, timeout=self.timeout)
         
     def create_search(self, query_expression):
         # sends a POST request to 
@@ -56,7 +56,7 @@ class APIClient():
         self.authenticate()
         endpoint = self.endpoint_start + "search/jobs"
         data = {'search': query_expression, 'output_mode': self.output_mode}
-        return self.client.call_api(endpoint, 'POST', data=data, timeout=self.timeout)
+        return self.client.call_api(endpoint, 'POST', urldata=data, timeout=self.timeout)
 
     def get_search(self, search_id):
         # sends a GET request to
@@ -64,8 +64,8 @@ class APIClient():
         # returns information about the search job and its properties.
         self.authenticate()
         endpoint = self.endpoint_start + 'search/jobs/' + search_id        
-        data = {'output_mode': self.output_mode}        
-        return self.client.call_api(endpoint, 'GET', data=data, timeout=self.timeout)
+        data = {'output_mode': self.output_mode}
+        return self.client.call_api(endpoint, 'GET', urldata=data, timeout=self.timeout)
 
     def get_search_results(self, search_id, offset, count):
         # sends a GET request to
@@ -87,4 +87,4 @@ class APIClient():
         self.authenticate()
         endpoint = self.endpoint_start + 'search/jobs/' + search_id
         data = {'output_mode': self.output_mode}
-        return self.client.call_api(endpoint, 'DELETE', data=data, timeout=self.timeout)
+        return self.client.call_api(endpoint, 'DELETE', urldata=data, timeout=self.timeout)
