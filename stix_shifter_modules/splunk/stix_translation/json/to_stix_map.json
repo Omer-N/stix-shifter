@@ -36,6 +36,12 @@
       "key": "network-traffic.src_ref",
       "object": "network-traffic",
       "references": "src_ip"
+    },
+    {
+      "key": "x-ibm-host.ip_refs",
+      "object": "host",
+      "references": "src_ip",
+      "group": true
     }
   ],
   "dest_port": {
@@ -63,6 +69,11 @@
       "key": "last_observed",
       "transformer": "SplunkToTimestamp",
       "cybox": false
+    },
+    {
+      "key": "x-ibm-event.created",
+      "transformer": "SplunkToTimestamp",
+      "object": "event"
     }
   ],
   "user": [
@@ -77,6 +88,11 @@
     {
       "key": "user-account.user_id",
       "object": "authentication"
+    },
+    {
+      "key": "x-ibm-event.user_ref",
+      "object": "event",
+      "references": "authentication"
     }
   ],
   "process_user": [
@@ -125,14 +141,116 @@
     "key": "x509-certificate.subject_public_key_algorithm",
     "object": "certificate"
   },
-  "process_name": {
-    "key": "process.name",
+  "process_id": [
+    {
+      "key": "process.pid",
+      "object": "process"
+    },
+    {
+      "key": "x-ibm-event.process_ref",
+      "object": "event",
+      "references": "process"
+    }
+  ],
+  "process_name": [
+    {
+      "key": "process.name",
+      "object": "process"
+    },
+    {
+      "key": "x-ibm-event.process_ref",
+      "object": "event",
+      "references": "process"
+    }
+  ],
+  "process": {
+    "key": "process.command_line",
     "object": "process"
   },
-  "process_id": {
-    "key": "process.pid",
-    "object": "process"
+  "process_exec": [
+    {
+      "key": "file.name",
+      "object": "process-exec"
+    },
+    {
+      "key": "process.binary_ref",
+      "object": "process",
+      "references": "process-exec"
+    }
+  ],
+  "process_hash": {
+    "key": "file.hashes.UNKNOWN",
+    "object": "process-exec"
   },
+  "process_path": [
+    {
+      "key": "directory.path",
+      "object": "process-path"
+    },
+    {
+      "key": "file.parent_directory_ref",
+      "object": "process-exec",
+      "references": "process-path"
+    }
+  ],
+  "parent_process_id": [
+    {
+      "key": "process.pid",
+      "object": "parent-process"
+    },
+    {
+      "key": "x-ibm-event.parent_process_ref",
+      "object": "event",
+      "references": "parent-process"
+    },
+    {
+      "key": "process.parent_ref",
+      "object": "process",
+      "references": "parent-process"
+    }
+  ],
+  "parent_process_name": [
+    {
+      "key": "process.name",
+      "object": "parent-process"
+    },
+    {
+      "key": "x-ibm-event.parent_process_ref",
+      "object": "event",
+      "references": "parent-process"
+    },
+    {
+      "key": "process.parent_ref",
+      "object": "process",
+      "references": "parent-process"
+    }
+  ],
+  "parent_process": {
+    "key": "process.command_line",
+    "object": "parent-process"
+  },
+  "parent_process_exec": [
+    {
+      "key": "file.name",
+      "object": "parent-process-exec"
+    },
+    {
+      "key": "process.binary_ref",
+      "object": "parent-process",
+      "references": "parent-process-exec"
+    }
+  ],
+  "parent_process_path": [
+    {
+      "key": "directory.path",
+      "object": "parent-process-path"
+    },
+    {
+      "key": "file.parent_directory_ref",
+      "object": "parent-process-exec",
+      "references": "parent-process-path"
+    }
+  ],
   "file_path": [
     {
       "key": "directory.path",
@@ -142,11 +260,6 @@
       "key": "file.parent_directory_ref",
       "object": "file",
       "references": "directory"
-    },
-    {
-      "key": "process.binary_ref",
-      "object": "process",
-      "references": "file"
     }
   ],
   "file_create_time": [
@@ -177,10 +290,17 @@
     "key": "file.hashes.UNKNOWN",
     "object": "file"
   },
-  "file_name": {
-    "key": "file.name",
-    "object": "file"
-  },
+  "file_name": [
+    {
+      "key": "file.name",
+      "object": "file"
+    },
+    {
+      "key": "x-ibm-event.file_ref",
+      "object": "event",
+      "references": "file"
+    }
+  ],
   "file_size": {
     "key": "file.size",
     "object": "file"
@@ -193,12 +313,16 @@
     {
       "key": "ipv4-addr.resolves_to_refs",
       "object": "src_ip",
-      "references": ["src_mac"]
+      "references": [
+        "src_mac"
+      ]
     },
     {
       "key": "ipv6-addr.resolves_to_refs",
       "object": "src_ip",
-      "references": ["src_mac"]
+      "references": [
+        "src_mac"
+      ]
     }
   ],
   "dest_mac": [
@@ -209,18 +333,29 @@
     {
       "key": "ipv4-addr.resolves_to_refs",
       "object": "dst_ip",
-      "references": ["dst_mac"]
+      "references": [
+        "dst_mac"
+      ]
     },
     {
       "key": "ipv6-addr.resolves_to_refs",
       "object": "dst_ip",
-      "references": ["dst_mac"]
+      "references": [
+        "dst_mac"
+      ]
     }
   ],
-  "object_path": {
-    "key": "windows-registry-key.key",
-    "object": "windows-registry-key"
-  },
+  "object_path": [
+    {
+      "key": "windows-registry-key.key",
+      "object": "windows-registry-key"
+    },
+    {
+      "key": "x-ibm-event.registry_ref",
+      "object": "event",
+      "references": "windows-registry-key"
+    }
+  ],
   "url": [
     {
       "key": "url.value",
@@ -255,5 +390,60 @@
     "key": "email-message.is_multipart",
     "object": "email-message",
     "transformer": "StringToBool"
-  }
+  },
+  "host": [
+    {
+      "key": "x-ibm-host.hostname",
+      "object": "host"
+    },
+    {
+      "key": "x-ibm-event.host_ref",
+      "object": "event",
+      "references": "host"
+    }
+  ],
+  "app": {
+    "key": "x-ibm-event.module",
+    "object": "event"
+  },
+  "description": {
+    "key": "x-ibm-event.action",
+    "object": "event"
+  },
+  "signature_id": {
+    "key": "x-ibm-event.action",
+    "object": "event"
+  },
+  "result": {
+    "key": "x-ibm-event.outcome",
+    "object": "event"
+  },
+  "query": [
+    {
+      "key": "domain-name.value",
+      "object": "domain"
+    },
+    {
+      "key": "network-traffic.extensions.dns-ext.question.domain_ref",
+      "object": "network-traffic",
+      "references": "domain"
+    },
+    {
+      "key": "x-ibm-event.domain_ref",
+      "object": "event",
+      "references": "domain"
+    }
+  ],
+  "answer": [
+    {
+      "key": "ipv4-addr.value",
+      "object": "resolved-ip"
+    },
+    {
+      "key": "network-traffic.extensions.dns-ext.resolved_ip_refs",
+      "object": "network-traffic",
+      "references": ["resolved-ip"],
+      "group": true
+    }
+  ]
 }
