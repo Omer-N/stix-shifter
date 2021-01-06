@@ -1,5 +1,7 @@
 from stix_shifter_utils.modules.cim.stix_translation.query_translator import CimBaseQueryTranslator
 import logging
+from os import path
+from stix_shifter_utils.utils.file_helper import read_json
 from . import query_constructor
 
 logger = logging.getLogger(__name__)
@@ -9,6 +11,18 @@ DEFAULT_FIELDS = "src_ip, src_port, src_mac, src_ipv6, dest_ip, dest_port, dest_
 
 
 class CimQueryTranslator(CimBaseQueryTranslator):
+    def __init__(self, options={}, dialect=None):
+        super().__init__(options, dialect)
+        if 'mapping' not in options or 'cim_select_fields' not in options['mapping']:
+            ext_select_fields = read_json('cim_select_fields_ext', options)
+            self.select_fields["default"].extend(ext_select_fields["default"])
+        if 'mapping' not in options or 'cim_from_stix_map' not in options['mapping']:
+            ext_map_data = self.fetch_mapping(path.dirname(__file__), dialect, options)
+            for obj_name, obj_dict in ext_map_data.items():
+                if obj_name not in self.map_data:
+                    self.map_data[obj_name] = obj_dict
+                else:
+                    self.map_data[obj_name]["fields"].update(obj_dict["fields"])
 
     def transform_antlr(self, data, antlr_parsing_object):
         """

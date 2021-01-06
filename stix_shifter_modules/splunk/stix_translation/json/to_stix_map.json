@@ -410,8 +410,12 @@
     "key": "x-ibm-event.action",
     "object": "event"
   },
-  "signature_id": {
+  "signature": {
     "key": "x-ibm-event.action",
+    "object": "event"
+  },
+  "signature_id": {
+    "key": "x-ibm-event.code",
     "object": "event"
   },
   "result": {

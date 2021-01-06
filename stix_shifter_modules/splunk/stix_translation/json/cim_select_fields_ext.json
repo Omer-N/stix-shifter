@@ -1,0 +1,22 @@
+{
+  "default": [
+    "process",
+    "process_id",
+    "process_name",
+    "process_exec",
+    "process_path",
+    "process_hash",
+    "parent_process",
+    "parent_process_id",
+    "parent_process_name",
+    "parent_process_exec",
+    "host",
+    "app",
+    "description",
+    "result",
+    "signature",
+    "signature_id",
+    "query",
+    "answer"
+  ]
+}
