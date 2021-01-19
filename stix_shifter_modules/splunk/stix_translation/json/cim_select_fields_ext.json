@@ -11,7 +11,7 @@
     "parent_process_name",
     "parent_process_exec",
     "host",
-    "app",
+    "source",
     "description",
     "result",
     "signature",

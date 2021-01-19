@@ -4,10 +4,18 @@
     "cybox": false,
     "transformer": "ToInteger"
   },
-  "_raw": {
-    "key": "artifact.payload_bin",
-    "transformer": "ToBase64"
-  },
+  "_raw": [
+    {
+      "key": "artifact.payload_bin",
+      "object": "artifact",
+      "transformer": "ToBase64"
+    },
+    {
+      "key": "x-oca-event.original_ref",
+      "object": "event",
+      "references": "artifact"
+    }
+  ],
   "dest_ip": [
     {
       "key": "ipv4-addr.value",
@@ -21,6 +29,14 @@
       "key": "network-traffic.dst_ref",
       "object": "network-traffic",
       "references": "dst_ip"
+    },
+    {
+      "key": "x-oca-event.ip_refs",
+      "object": "event",
+      "references": [
+        "dst_ip"
+      ],
+      "group": true
     }
   ],
   "src_ip": [
@@ -38,9 +54,11 @@
       "references": "src_ip"
     },
     {
-      "key": "x-ibm-host.ip_refs",
-      "object": "host",
-      "references": "src_ip",
+      "key": "x-oca-event.ip_refs",
+      "object": "event",
+      "references": [
+        "src_ip"
+      ],
       "group": true
     }
   ],
@@ -71,7 +89,7 @@
       "cybox": false
     },
     {
-      "key": "x-ibm-event.created",
+      "key": "x-oca-event.created",
       "transformer": "SplunkToTimestamp",
       "object": "event"
     }
@@ -90,7 +108,7 @@
       "object": "authentication"
     },
     {
-      "key": "x-ibm-event.user_ref",
+      "key": "x-oca-event.user_ref",
       "object": "event",
       "references": "authentication"
     }
@@ -147,7 +165,7 @@
       "object": "process"
     },
     {
-      "key": "x-ibm-event.process_ref",
+      "key": "x-oca-event.process_ref",
       "object": "event",
       "references": "process"
     }
@@ -158,7 +176,7 @@
       "object": "process"
     },
     {
-      "key": "x-ibm-event.process_ref",
+      "key": "x-oca-event.process_ref",
       "object": "event",
       "references": "process"
     }
@@ -176,11 +194,17 @@
       "key": "process.binary_ref",
       "object": "process",
       "references": "process-exec"
+    },
+    {
+      "key": "x-oca-event.file_ref",
+      "object": "event",
+      "references": "process-exec"
     }
   ],
   "process_hash": {
-    "key": "file.hashes.UNKNOWN",
-    "object": "process-exec"
+    "key": "file.hashes",
+    "object": "process-exec",
+    "transformer": "SplunkHash"
   },
   "process_path": [
     {
@@ -199,7 +223,7 @@
       "object": "parent-process"
     },
     {
-      "key": "x-ibm-event.parent_process_ref",
+      "key": "x-oca-event.parent_process_ref",
       "object": "event",
       "references": "parent-process"
     },
@@ -215,7 +239,7 @@
       "object": "parent-process"
     },
     {
-      "key": "x-ibm-event.parent_process_ref",
+      "key": "x-oca-event.parent_process_ref",
       "object": "event",
       "references": "parent-process"
     },
@@ -296,7 +320,7 @@
       "object": "file"
     },
     {
-      "key": "x-ibm-event.file_ref",
+      "key": "x-oca-event.file_ref",
       "object": "event",
       "references": "file"
     }
@@ -351,7 +375,7 @@
       "object": "windows-registry-key"
     },
     {
-      "key": "x-ibm-event.registry_ref",
+      "key": "x-oca-event.registry_ref",
       "object": "event",
       "references": "windows-registry-key"
     }
@@ -393,33 +417,33 @@
   },
   "host": [
     {
-      "key": "x-ibm-host.hostname",
+      "key": "x-oca-asset.hostname",
       "object": "host"
     },
     {
-      "key": "x-ibm-event.host_ref",
+      "key": "x-oca-event.host_ref",
       "object": "event",
       "references": "host"
     }
   ],
-  "app": {
-    "key": "x-ibm-event.module",
+  "source": {
+    "key": "x-oca-event.module",
     "object": "event"
   },
   "description": {
-    "key": "x-ibm-event.action",
+    "key": "x-oca-event.action",
     "object": "event"
   },
   "signature": {
-    "key": "x-ibm-event.action",
+    "key": "x-oca-event.action",
     "object": "event"
   },
   "signature_id": {
-    "key": "x-ibm-event.code",
+    "key": "x-oca-event.code",
     "object": "event"
   },
   "result": {
-    "key": "x-ibm-event.outcome",
+    "key": "x-oca-event.outcome",
     "object": "event"
   },
   "query": [
@@ -433,7 +457,7 @@
       "references": "domain"
     },
     {
-      "key": "x-ibm-event.domain_ref",
+      "key": "x-oca-event.domain_ref",
       "object": "event",
       "references": "domain"
     }
@@ -446,7 +470,9 @@
     {
       "key": "network-traffic.extensions.dns-ext.resolved_ip_refs",
       "object": "network-traffic",
-      "references": ["resolved-ip"],
+      "references": [
+        "resolved-ip"
+      ],
       "group": true
     }
   ]

@@ -1,11 +1,11 @@
 {
-  "x-ibm-event": {
+  "x-oca-event": {
     "cim_type": "alert",
     "fields": {
       "code": ["signature_id"],
       "action": ["signature"],
       "outcome": ["result"],
-      "module": ["app"],
+      "module": ["source"],
       "created": ["_time"],
       "process_ref.command_line": ["process"],
       "process_ref.binary_ref.name": ["process_exec"],
@@ -26,7 +26,7 @@
       "url_ref.value": ["url"]
     }
   },
-  "x-ibm-host": {
+  "x-oca-asset": {
     "cim_type": "host",
     "fields": {
       "hostname": "host"
