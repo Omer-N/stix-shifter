@@ -37,6 +37,11 @@
         "dst_ip"
       ],
       "group": true
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
     }
   ],
   "src_ip": [
@@ -60,23 +65,49 @@
         "src_ip"
       ],
       "group": true
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
     }
   ],
-  "dest_port": {
-    "key": "network-traffic.dst_port",
-    "object": "network-traffic",
-    "transformer": "ToInteger"
-  },
-  "src_port": {
-    "key": "network-traffic.src_port",
-    "object": "network-traffic",
-    "transformer": "ToInteger"
-  },
-  "protocol": {
-    "key": "network-traffic.protocols",
-    "object": "network-traffic",
-    "transformer": "ToLowercaseArray"
-  },
+  "dest_port": [
+    {
+      "key": "network-traffic.dst_port",
+      "object": "network-traffic",
+      "transformer": "ToInteger"
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
+    }
+  ],
+  "src_port": [
+    {
+      "key": "network-traffic.src_port",
+      "object": "network-traffic",
+      "transformer": "ToInteger"
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
+    }
+  ],
+  "protocol": [
+    {
+      "key": "network-traffic.protocols",
+      "object": "network-traffic",
+      "transformer": "ToLowercaseArray"
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
+    }
+  ],
   "_time": [
     {
       "key": "first_observed",
@@ -460,6 +491,11 @@
       "key": "x-oca-event.domain_ref",
       "object": "event",
       "references": "domain"
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
     }
   ],
   "answer": [
@@ -474,6 +510,11 @@
         "resolved-ip"
       ],
       "group": true
+    },
+    {
+      "key": "x-ibm-event.network_ref",
+      "object": "event",
+      "references": "network-traffic"
     }
   ]
 }
