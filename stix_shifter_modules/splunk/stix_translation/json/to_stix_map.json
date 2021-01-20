@@ -42,6 +42,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "src_ip": [
@@ -70,6 +77,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "dest_port": [
@@ -82,6 +96,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "src_port": [
@@ -94,6 +115,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "protocol": [
@@ -106,6 +134,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "_time": [
@@ -496,6 +531,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
   ],
   "answer": [
@@ -515,6 +557,13 @@
       "key": "x-ibm-event.network_ref",
       "object": "event",
       "references": "network-traffic"
+    },
+    {
+      "key": "process.opened_connection_refs",
+      "object": "process",
+      "references": [
+        "network-traffic"
+      ]
     }
-  ]
+      ]
 }
