@@ -22,6 +22,35 @@ data_source = {
 }
 options = {}
 
+sample_splunk_data_x_oca = {
+    "src_ip": "123.123.123.123",
+    "src_port": "56109",
+    "dest_ip": "1.1.1.1",
+    "dest_port": "9389",
+    "user": "SYSTEM",
+    "protocol": "-",
+    "process_id": "912",
+    "process_name": "powershell.exe",
+    "process_exec": "powershell.exe",
+    "process_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "host": "WIN01",
+    "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+    "signature": "Network Connect",
+    "signature_id": "3",
+    "_bkt": "main~13~01865622-E388-4D42-93EA-81D878D7EE08",
+    "_cd": "13:783766",
+    "_indextime": "1611052433",
+    "_kv": "1",
+    "_raw": "<raw data>",
+    "_serial": "3",
+    "_si": [
+        "abc",
+        "main"
+    ],
+    "_sourcetype": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+    "_time": "2021-01-19T12:33:52.000+02:00"
+}
+
 
 class TestTransform(unittest.TestCase, object):
     @staticmethod
@@ -46,27 +75,27 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
 
         result_bundle_identity = result_bundle_objects[0]
-        assert(result_bundle_identity['type'] == data_source['type'])
-        assert(result_bundle_identity['id'] == data_source['id'])
-        assert(result_bundle_identity['name'] == data_source['name'])
-        assert(result_bundle_identity['identity_class']
-               == data_source['identity_class'])
+        assert (result_bundle_identity['type'] == data_source['type'])
+        assert (result_bundle_identity['id'] == data_source['id'])
+        assert (result_bundle_identity['name'] == data_source['name'])
+        assert (result_bundle_identity['identity_class']
+                == data_source['identity_class'])
 
         observed_data = result_bundle_objects[1]
 
-        assert(observed_data['id'] is not None)
-        assert(observed_data['type'] == "observed-data")
-        assert(observed_data['created_by_ref'] == result_bundle_identity['id'])
+        assert (observed_data['id'] is not None)
+        assert (observed_data['type'] == "observed-data")
+        assert (observed_data['created_by_ref'] == result_bundle_identity['id'])
 
-        assert(observed_data['number_observed'] == 5)
-        assert(observed_data['created'] is not None)
-        assert(observed_data['modified'] is not None)
-        assert(observed_data['first_observed'] is not None)
-        assert(observed_data['last_observed'] is not None)
+        assert (observed_data['number_observed'] == 5)
+        assert (observed_data['created'] is not None)
+        assert (observed_data['modified'] is not None)
+        assert (observed_data['first_observed'] is not None)
+        assert (observed_data['last_observed'] is not None)
 
     def test_change_cim_to_stix(self):
         count = 1
@@ -91,51 +120,51 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
         validated_result = validate_instance(observed_data)
-        assert(validated_result.is_valid == True)
+        assert (validated_result.is_valid == True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         # Test objects in Stix observable data model after transform
         wrk_obj = TestTransform.get_first_of_type(objects.values(), 'windows-registry-key')
-        assert(wrk_obj is not None)
-        assert(wrk_obj.keys() == {'type', 'key'})
-        assert(wrk_obj['key'] == "hkey_local_machine\\system\\bar\\foo")
+        assert (wrk_obj is not None)
+        assert (wrk_obj.keys() == {'type', 'key'})
+        assert (wrk_obj['key'] == "hkey_local_machine\\system\\bar\\foo")
 
         user_obj = TestTransform.get_first_of_type(objects.values(), 'user-account')
 
-        assert(user_obj is not None), 'user-account object type not found'
-        assert(user_obj.keys() == {'type', 'account_login', 'user_id'})
-        assert(user_obj['account_login'] == "ibm_user")
-        assert(user_obj['user_id'] == "ibm_user")
+        assert (user_obj is not None), 'user-account object type not found'
+        assert (user_obj.keys() == {'type', 'account_login', 'user_id'})
+        assert (user_obj['account_login'] == "ibm_user")
+        assert (user_obj['user_id'] == "ibm_user")
 
         file_obj = TestTransform.get_first_of_type(objects.values(), 'file')
 
-        assert(file_obj is not None), 'file object type not found'
-        assert(file_obj.keys() == {'type', 'parent_directory_ref', 'created', 'modified', 'hashes', 'name', 'size'})
+        assert (file_obj is not None), 'file object type not found'
+        assert (file_obj.keys() == {'type', 'parent_directory_ref', 'created', 'modified', 'hashes', 'name', 'size'})
 
-        assert(file_obj['created'] == "2018-08-15T15:11:55.676Z")
-        assert(file_obj['modified'] == "2018-08-15T18:10:30.456Z")
-        assert(file_obj['name'] == "sample.dll")
-        assert(file_obj['size'] == 25536)
+        assert (file_obj['created'] == "2018-08-15T15:11:55.676Z")
+        assert (file_obj['modified'] == "2018-08-15T18:10:30.456Z")
+        assert (file_obj['name'] == "sample.dll")
+        assert (file_obj['size'] == 25536)
         assert (file_obj['hashes']['MD5'] == "41a26255d16d121dc525a6445144b895")
 
         dir_ref = file_obj['parent_directory_ref']
-        assert(dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
+        assert (dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
         dir_obj = objects[dir_ref]
 
-        assert(dir_obj is not None), 'directory object type not found'
-        assert(dir_obj.keys() == {'type', 'path', 'created', 'modified'})
-        assert(dir_obj['path'] == "C:\\Users\\someuser\\sample.dll")
-        assert(dir_obj['created'] == "2018-08-15T15:11:55.676Z")
-        assert(dir_obj['modified'] == "2018-08-15T18:10:30.456Z")
+        assert (dir_obj is not None), 'directory object type not found'
+        assert (dir_obj.keys() == {'type', 'path', 'created', 'modified'})
+        assert (dir_obj['path'] == "C:\\Users\\someuser\\sample.dll")
+        assert (dir_obj['created'] == "2018-08-15T15:11:55.676Z")
+        assert (dir_obj['modified'] == "2018-08-15T18:10:30.456Z")
         print(objects.keys())
         print(result_bundle_objects)
-        assert(objects.keys() == set(map(str, range(0, 5))))
+        assert (objects.keys() == set(map(str, range(0, 5))))
 
     def test_certificate_cim_to_stix(self):
         count = 1
@@ -158,29 +187,31 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         validated_result = validate_instance(observed_data)
-        assert(validated_result.is_valid == True)
+        assert (validated_result.is_valid == True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         # Test objects in Stix observable data model after transform
         cert_obj = TestTransform.get_first_of_type(objects.values(), 'x509-certificate')
 
-        assert(cert_obj is not None), 'x509-certificate object type not found'
-        assert(cert_obj.keys() == {'type', 'serial_number', 'version', "signature_algorithm", "subject_public_key_algorithm", "issuer", "subject", "hashes"})
-        assert(cert_obj['serial_number'] == "1234")
-        assert(cert_obj['version'] == "1")
-        assert(cert_obj['signature_algorithm'] == "md5WithRSAEncryption")
-        assert(cert_obj['issuer'] == "C=US, ST=California, O=www.example.com, OU=new, CN=new")
-        assert(cert_obj['subject'] == "C=US, ST=Maryland, L=Baltimore, O=John Doe, OU=ExampleCorp, CN=www.example.com/emailAddress=doe@example.com")
-        assert(cert_obj['subject_public_key_algorithm'] == "rsaEncryption")
-        assert(cert_obj['hashes']['SHA-256'] == "aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f")
-        assert(objects.keys() == set(map(str, range(0, 2))))
+        assert (cert_obj is not None), 'x509-certificate object type not found'
+        assert (cert_obj.keys() == {'type', 'serial_number', 'version', "signature_algorithm",
+                                    "subject_public_key_algorithm", "issuer", "subject", "hashes"})
+        assert (cert_obj['serial_number'] == "1234")
+        assert (cert_obj['version'] == "1")
+        assert (cert_obj['signature_algorithm'] == "md5WithRSAEncryption")
+        assert (cert_obj['issuer'] == "C=US, ST=California, O=www.example.com, OU=new, CN=new")
+        assert (cert_obj[
+                    'subject'] == "C=US, ST=Maryland, L=Baltimore, O=John Doe, OU=ExampleCorp, CN=www.example.com/emailAddress=doe@example.com")
+        assert (cert_obj['subject_public_key_algorithm'] == "rsaEncryption")
+        assert (cert_obj['hashes']['SHA-256'] == "aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f")
+        assert (objects.keys() == set(map(str, range(0, 2))))
 
     def test_process_cim_to_stix(self):
         count = 1
@@ -201,52 +232,51 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         validated_result = validate_instance(observed_data)
-        assert(validated_result.is_valid == True)
+        assert (validated_result.is_valid == True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         # Test objects in Stix observable data model after transform
         event_obj = TestTransform.get_first_of_type(objects.values(), 'x-ibm-event')
-        assert(event_obj is not None), 'event object type not found'
-        assert(event_obj.keys() == {'type', 'process_ref', 'created', 'user_ref'})
-
+        assert (event_obj is not None), 'event object type not found'
+        assert (event_obj.keys() == {'type', 'process_ref', 'created', 'user_ref'})
 
         proc_obj = TestTransform.get_first_of_type(objects.values(), 'process')
-        assert(proc_obj is not None), 'process object type not found'
-        assert(proc_obj.keys() == {'type', 'name', 'pid', 'binary_ref'})
-        assert(proc_obj['name'] == "test_process")
-        assert(proc_obj['pid'] == 0)
+        assert (proc_obj is not None), 'process object type not found'
+        assert (proc_obj.keys() == {'type', 'name', 'pid', 'binary_ref'})
+        assert (proc_obj['name'] == "test_process")
+        assert (proc_obj['pid'] == 0)
 
         user_obj = TestTransform.get_first_of_type(objects.values(), 'user-account')
 
-        assert(user_obj is not None), 'user-account object type not found'
-        assert(user_obj.keys() == {'type', 'account_login', 'user_id'})
-        assert(user_obj['account_login'] == "test_user")
-        assert(user_obj['user_id'] == "test_user")
+        assert (user_obj is not None), 'user-account object type not found'
+        assert (user_obj.keys() == {'type', 'account_login', 'user_id'})
+        assert (user_obj['account_login'] == "test_user")
+        assert (user_obj['user_id'] == "test_user")
 
         bin_ref = proc_obj['binary_ref']
-        assert(bin_ref in objects), f"binary_ref with key {proc_obj['binary_ref']} not found"
+        assert (bin_ref in objects), f"binary_ref with key {proc_obj['binary_ref']} not found"
         file_obj = objects[bin_ref]
 
-        assert(file_obj is not None), 'file object type not found'
-        assert(file_obj.keys() == {'type', 'parent_directory_ref', 'name', 'hashes'})
-        assert(file_obj['name'] == "sample.dll")
+        assert (file_obj is not None), 'file object type not found'
+        assert (file_obj.keys() == {'type', 'parent_directory_ref', 'name', 'hashes'})
+        assert (file_obj['name'] == "sample.dll")
         assert (file_obj['hashes']['UNKNOWN'] == "aec070645fe53ee3b3763059376134f058cc337247c978add178b6ccdfb0019f")
         dir_ref = file_obj['parent_directory_ref']
-        assert(dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
+        assert (dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
         dir_obj = objects[dir_ref]
 
-        assert(dir_obj is not None), 'directory object type not found'
-        assert(dir_obj.keys() == {'type', 'path'})
-        assert(dir_obj['path'] == "C:\\Users\\someuser\\sample.dll")
+        assert (dir_obj is not None), 'directory object type not found'
+        assert (dir_obj.keys() == {'type', 'path'})
+        assert (dir_obj['path'] == "C:\\Users\\someuser\\sample.dll")
 
-        assert(objects.keys() == set(map(str, range(0, 5))))
+        assert (objects.keys() == set(map(str, range(0, 5))))
 
     def test_network_cim_to_stix(self):
         count = 2
@@ -266,36 +296,36 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
 
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         validated_result = validate_instance(observed_data)
-        assert(validated_result.is_valid == True)
-        assert('objects' in observed_data)
+        assert (validated_result.is_valid == True)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         nt_obj = TestTransform.get_first_of_type(objects.values(), 'network-traffic')
-        assert(nt_obj is not None), 'network-traffic object type not found'
-        assert(nt_obj.keys() == {'type', 'src_port', 'dst_port', 'src_ref', 'dst_ref', 'protocols'})
-        assert(nt_obj['src_port'] == 8080)
-        assert(nt_obj['dst_port'] == 8090)
-        assert(nt_obj['protocols'] == ['http'])
+        assert (nt_obj is not None), 'network-traffic object type not found'
+        assert (nt_obj.keys() == {'type', 'src_port', 'dst_port', 'src_ref', 'dst_ref', 'protocols'})
+        assert (nt_obj['src_port'] == 8080)
+        assert (nt_obj['dst_port'] == 8090)
+        assert (nt_obj['protocols'] == ['http'])
 
         ip_ref = nt_obj['dst_ref']
-        assert(ip_ref in objects), f"dst_ref with key {nt_obj['dst_ref']} not found"
+        assert (ip_ref in objects), f"dst_ref with key {nt_obj['dst_ref']} not found"
         ip_obj = objects[ip_ref]
-        assert(ip_obj.keys() == {'type', 'value'})
-        assert(ip_obj['type'] == 'ipv4-addr')
-        assert(ip_obj['value'] == dest_ip)
+        assert (ip_obj.keys() == {'type', 'value'})
+        assert (ip_obj['type'] == 'ipv4-addr')
+        assert (ip_obj['value'] == dest_ip)
 
         ip_ref = nt_obj['src_ref']
-        assert(ip_ref in objects), f"src_ref with key {nt_obj['src_ref']} not found"
+        assert (ip_ref in objects), f"src_ref with key {nt_obj['src_ref']} not found"
         ip_obj = objects[ip_ref]
-        assert(ip_obj.keys() == {'type', 'value'})
-        assert(ip_obj['type'] == 'ipv6-addr')
-        assert(ip_obj['value'] == src_ip)
+        assert (ip_obj.keys() == {'type', 'value'})
+        assert (ip_obj['type'] == 'ipv6-addr')
+        assert (ip_obj['value'] == src_ip)
 
     def test_email_cim_to_stix(self):
         count = 3
@@ -311,38 +341,38 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
 
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         validated_result = validate_instance(observed_data)
-        assert(validated_result.is_valid == True)
+        assert (validated_result.is_valid == True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         msg_obj = TestTransform.get_first_of_type(objects.values(), 'email-message')
-        assert(msg_obj is not None), 'email-message object type not found'
-        assert(msg_obj.keys() == {'type', 'subject', 'sender_ref', 'from_ref', 'is_multipart'})
-        assert(msg_obj['subject'] == "Test Subject")
-        assert(msg_obj['is_multipart'] == False)
+        assert (msg_obj is not None), 'email-message object type not found'
+        assert (msg_obj.keys() == {'type', 'subject', 'sender_ref', 'from_ref', 'is_multipart'})
+        assert (msg_obj['subject'] == "Test Subject")
+        assert (msg_obj['is_multipart'] == False)
 
         sender_ref = msg_obj['sender_ref']
-        assert(sender_ref in objects), f"sender_ref with key {msg_obj['sender_ref']} not found"
+        assert (sender_ref in objects), f"sender_ref with key {msg_obj['sender_ref']} not found"
 
         addr_obj = objects[sender_ref]
-        assert(addr_obj.keys() == {'type', 'value'})
-        assert(addr_obj['type'] == 'email-addr')
-        assert(addr_obj['value'] == src_user)
+        assert (addr_obj.keys() == {'type', 'value'})
+        assert (addr_obj['type'] == 'email-addr')
+        assert (addr_obj['value'] == src_user)
 
         from_ref = msg_obj['from_ref']
-        assert(sender_ref in objects), f"from_ref with key {msg_obj['from_ref']} not found"
+        assert (sender_ref in objects), f"from_ref with key {msg_obj['from_ref']} not found"
 
         addr_obj = objects[from_ref]
-        assert(addr_obj.keys() == {'type', 'value'})
-        assert(addr_obj['type'] == 'email-addr')
-        assert(addr_obj['value'] == src_user)
+        assert (addr_obj.keys() == {'type', 'value'})
+        assert (addr_obj['type'] == 'email-addr')
+        assert (addr_obj['value'] == src_user)
 
     def test_custom_mapping(self):
 
@@ -391,13 +421,13 @@ class TestTransform(unittest.TestCase, object):
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
 
         curr_obj = TestTransform.get_first_of_type(objects.values(), 'ipv4-addr')
-        assert(curr_obj is not None), 'ipv4-addr object type not found'
-        assert(curr_obj.keys() == {'type', 'value'})
-        assert(curr_obj['value'] == "127.0.0.1")
+        assert (curr_obj is not None), 'ipv4-addr object type not found'
+        assert (curr_obj.keys() == {'type', 'value'})
+        assert (curr_obj['value'] == "127.0.0.1")
 
     def test_cim_to_stix_no_tags(self):
 
@@ -424,36 +454,36 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
 
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
         # somehow breaking the stix validation
         # validated_result = validate_instance(observed_data)
         # assert(validated_result.is_valid == True)
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
         nt_obj = TestTransform.get_first_of_type(objects.values(), 'network-traffic')
-        assert(nt_obj is not None), 'network-traffic object type not found'
-        assert(nt_obj.keys() == {'type', 'src_ref', 'src_port', 'dst_ref', 'dst_port', 'protocols'})
-        assert(nt_obj['src_port'] == 1220)
-        assert(nt_obj['dst_port'] == 1120)
-        assert(nt_obj['protocols'] == ['tcp'])
+        assert (nt_obj is not None), 'network-traffic object type not found'
+        assert (nt_obj.keys() == {'type', 'src_ref', 'src_port', 'dst_ref', 'dst_port', 'protocols'})
+        assert (nt_obj['src_port'] == 1220)
+        assert (nt_obj['dst_port'] == 1120)
+        assert (nt_obj['protocols'] == ['tcp'])
 
         ip_ref = nt_obj['dst_ref']
-        assert(ip_ref in objects), "dst_ref with key {nt_obj['dst_ref']} not found"
+        assert (ip_ref in objects), "dst_ref with key {nt_obj['dst_ref']} not found"
         ip_obj = objects[ip_ref]
-        assert(ip_obj.keys() == {'type', 'value', 'resolves_to_refs'})
-        assert(ip_obj['type'] == 'ipv4-addr')
-        assert(ip_obj['value'] == '127.0.0.1')
+        assert (ip_obj.keys() == {'type', 'value', 'resolves_to_refs'})
+        assert (ip_obj['type'] == 'ipv4-addr')
+        assert (ip_obj['value'] == '127.0.0.1')
         assert (isinstance(ip_obj['resolves_to_refs'], list) and isinstance(ip_obj['resolves_to_refs'][0], str))
 
         ip_ref = nt_obj['src_ref']
-        assert(ip_ref in objects), "src_ref with key {nt_obj['src_ref']} not found"
+        assert (ip_ref in objects), "src_ref with key {nt_obj['src_ref']} not found"
         ip_obj = objects[ip_ref]
-        assert(ip_obj.keys() == {'type', 'value', 'resolves_to_refs'})
-        assert(ip_obj['type'] == 'ipv4-addr')
-        assert(ip_obj['value'] == '169.250.0.1')
+        assert (ip_obj.keys() == {'type', 'value', 'resolves_to_refs'})
+        assert (ip_obj['type'] == 'ipv4-addr')
+        assert (ip_obj['value'] == '169.250.0.1')
         assert (isinstance(ip_obj['resolves_to_refs'], list) and isinstance(ip_obj['resolves_to_refs'][0], str))
 
         file_obj = TestTransform.get_first_of_type(objects.values(), 'file')
@@ -509,14 +539,14 @@ class TestTransform(unittest.TestCase, object):
         result_bundle = json_to_stix_translator.convert_to_stix(
             data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         # validated_result = validate_instance(observed_data)
         # assert(validated_result.is_valid is True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
         object_vals = objects.values()
 
@@ -524,105 +554,78 @@ class TestTransform(unittest.TestCase, object):
 
         proc_obj = TestTransform.get_nth_of_type(object_vals, 'process', 0)
         parent_proc_obj = TestTransform.get_nth_of_type(object_vals, 'process', 1)
-        assert(proc_obj is not None and parent_proc_obj is not None), 'process object type not found'
-        assert('parent_ref' in proc_obj or 'parent_ref' in parent_proc_obj)
+        assert (proc_obj is not None and parent_proc_obj is not None), 'process object type not found'
+        assert ('parent_ref' in proc_obj or 'parent_ref' in parent_proc_obj)
         if 'parent_ref' in parent_proc_obj:
             proc_obj, parent_proc_obj = parent_proc_obj, proc_obj
-        assert(proc_obj.keys() == {'type', 'name', 'pid', 'binary_ref', 'parent_ref'})
-        assert(proc_obj['name'] == "powershell.exe")
-        assert(proc_obj['pid'] == 2)
-        assert(objects[proc_obj['parent_ref']] == parent_proc_obj)
-        assert(parent_proc_obj['name'] == 'cmd.exe')
-        assert(parent_proc_obj['pid'] == 1)
+        assert (proc_obj.keys() == {'type', 'name', 'pid', 'binary_ref', 'parent_ref'})
+        assert (proc_obj['name'] == "powershell.exe")
+        assert (proc_obj['pid'] == 2)
+        assert (objects[proc_obj['parent_ref']] == parent_proc_obj)
+        assert (parent_proc_obj['name'] == 'cmd.exe')
+        assert (parent_proc_obj['pid'] == 1)
 
         user_obj = TestTransform.get_first_of_type(object_vals, 'user-account')
 
-        assert(user_obj is not None), 'user-account object type not found'
-        assert(user_obj.keys() == {'type', 'account_login', 'user_id'})
-        assert(user_obj['account_login'] == "test_user")
-        assert(user_obj['user_id'] == "test_user")
+        assert (user_obj is not None), 'user-account object type not found'
+        assert (user_obj.keys() == {'type', 'account_login', 'user_id'})
+        assert (user_obj['account_login'] == "test_user")
+        assert (user_obj['user_id'] == "test_user")
 
         bin_ref = proc_obj['binary_ref']
-        assert(bin_ref in objects), f"binary_ref with key {proc_obj['binary_ref']} not found"
+        assert (bin_ref in objects), f"binary_ref with key {proc_obj['binary_ref']} not found"
         file_obj = objects[bin_ref]
 
-        assert(file_obj is not None), 'file object type not found'
-        assert(file_obj.keys() == {'type', 'parent_directory_ref', 'name'})
-        assert(file_obj['name'] == "powershell.exe")
+        assert (file_obj is not None), 'file object type not found'
+        assert (file_obj.keys() == {'type', 'parent_directory_ref', 'name'})
+        assert (file_obj['name'] == "powershell.exe")
         dir_ref = file_obj['parent_directory_ref']
-        assert(dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
+        assert (dir_ref in objects), f"parent_directory_ref with key {file_obj['parent_directory_ref']} not found"
         dir_obj = objects[dir_ref]
 
-        assert(dir_obj is not None), 'directory object type not found'
-        assert(dir_obj.keys() == {'type', 'path'})
-        assert(dir_obj['path'] == "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0")
+        assert (dir_obj is not None), 'directory object type not found'
+        assert (dir_obj.keys() == {'type', 'path'})
+        assert (dir_obj['path'] == "C:\\Windows\\SysWOW64\\WindowsPowerShell\\v1.0")
 
         host_obj = TestTransform.get_first_of_type(object_vals, 'x-ibm-host')
-        assert(host_obj is not None)
-        assert(host_obj["hostname"] == "test_host")
+        assert (host_obj is not None)
+        assert (host_obj["hostname"] == "test_host")
 
         ip_obj = TestTransform.get_first_of_type(object_vals, 'ipv4-addr')
-        assert(ip_obj is not None)
-        assert(ip_obj['value'] == '1.2.3.4')
+        assert (ip_obj is not None)
+        assert (ip_obj['value'] == '1.2.3.4')
 
         domain_obj = TestTransform.get_first_of_type(object_vals, 'domain-name')
-        assert(domain_obj is not None)
-        assert(domain_obj['value'] == "test-domain.com")
+        assert (domain_obj is not None)
+        assert (domain_obj['value'] == "test-domain.com")
 
         nt_obj = TestTransform.get_first_of_type(object_vals, 'network-traffic')
-        assert(nt_obj is not None)
-        assert(objects[nt_obj["extensions"]["dns-ext"]["question"]["domain_ref"]] == domain_obj)
-        assert(objects[nt_obj["extensions"]["dns-ext"]["resolved_ip_refs"][0]] == ip_obj)
+        assert (nt_obj is not None)
+        assert (objects[nt_obj["extensions"]["dns-ext"]["question"]["domain_ref"]] == domain_obj)
+        assert (objects[nt_obj["extensions"]["dns-ext"]["resolved_ip_refs"][0]] == ip_obj)
 
         event_obj = TestTransform.get_first_of_type(object_vals, 'x-ibm-event')
-        assert(event_obj is not None), 'event object type not found'
-        assert(event_obj.keys() == {'type', 'process_ref', 'created', 'user_ref', 'parent_process_ref', 'domain_ref', 'host_ref'})
+        assert (event_obj is not None), 'event object type not found'
+        assert (event_obj.keys() == {'type', 'process_ref', 'created', 'user_ref', 'parent_process_ref', 'domain_ref',
+                                     'host_ref'})
         for key, obj in [('process_ref', proc_obj), ('user_ref', user_obj), ('parent_process_ref', parent_proc_obj),
                          ('domain_ref', domain_obj), ('host_ref', host_obj)]:
-            assert(objects[event_obj[key]] == obj)
-        assert(objects.keys() == set(map(str, range(0, 10))))
+            assert (objects[event_obj[key]] == obj)
+        assert (objects.keys() == set(map(str, range(0, 10))))
 
-    def test_x_oca(self):
-        data = {
-            "src_ip": "9.148.244.42",
-            "src_port": "56109",
-            "dest_ip": "9.148.3.121",
-            "dest_port": "9389",
-            "user": "SYSTEM",
-            "protocol": "-",
-            "process_id": "912",
-            "process_name": "powershell.exe",
-            "process_exec": "powershell.exe",
-            "process_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-            "host": "WIN01",
-            "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
-            "signature": "Network Connect",
-            "signature_id": "3",
-            "_bkt": "main~13~01865622-E388-4D42-93EA-81D878D7EE08",
-            "_cd": "13:783766",
-            "_indextime": "1611052433",
-            "_kv": "1",
-            "_raw": "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Sysmon' Guid='{5770385f-c22a-43e0-bf4c-06f5698ffbd9}'/><EventID>3</EventID><Version>5</Version><Level>4</Level><Task>3</Task><Opcode>0</Opcode><Keywords>0x8000000000000000</Keywords><TimeCreated SystemTime='2021-01-19T10:33:52.194972300Z'/><EventRecordID>528438</EventRecordID><Correlation/><Execution ProcessID='3252' ThreadID='4460'/><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>win01.sl.cloud9.ibm.com</Computer><Security UserID='S-1-5-18'/></System><EventData><Data Name='RuleName'>-</Data><Data Name='UtcTime'>2021-01-19 10:33:52.142</Data><Data Name='ProcessGuid'>{077e539d-b586-6006-ca2e-000000001b00}</Data><Data Name='ProcessId'>912</Data><Data Name='Image'>C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe</Data><Data Name='User'>NT AUTHORITY\\SYSTEM</Data><Data Name='Protocol'>tcp</Data><Data Name='Initiated'>true</Data><Data Name='SourceIsIpv6'>false</Data><Data Name='SourceIp'>9.148.244.42</Data><Data Name='SourceHostname'>win01.sl.cloud9.ibm.com</Data><Data Name='SourcePort'>56109</Data><Data Name='SourcePortName'>-</Data><Data Name='DestinationIsIpv6'>false</Data><Data Name='DestinationIp'>9.148.3.121</Data><Data Name='DestinationHostname'>haifadc02.haifa.ibm.com</Data><Data Name='DestinationPort'>9389</Data><Data Name='DestinationPortName'>-</Data></EventData></Event>",
-            "_serial": "3",
-            "_si": [
-                "bgu-farsight2",
-                "main"
-            ],
-            "_sourcetype": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
-            "_time": "2021-01-19T12:33:52.000+02:00"
-        }
-
+    def test_x_oca_event_fields(self):
         result_bundle = json_to_stix_translator.convert_to_stix(
-            data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
+            data_source, map_data, [sample_splunk_data_x_oca], get_module_transformers(MODULE), options,
+            callback=hash_type_lookup)
 
-        assert(result_bundle['type'] == 'bundle')
+        assert (result_bundle['type'] == 'bundle')
         result_bundle_objects = result_bundle['objects']
         observed_data = result_bundle_objects[1]
 
         # validated_result = validate_instance(observed_data)
         # assert(validated_result.is_valid is True)
 
-        assert('objects' in observed_data)
+        assert ('objects' in observed_data)
         objects = observed_data['objects']
         object_vals = objects.values()
 
@@ -630,6 +633,84 @@ class TestTransform(unittest.TestCase, object):
         self.assertEqual(x_oca_event['module'], 'XmlWinEventLog:Microsoft-Windows-Sysmon/Operational')
         self.assertEqual(x_oca_event['action'], 'Network Connect')
         self.assertEqual(x_oca_event['code'], '3')
+
+    def test_x_oca_event_network_ref(self):
+        result_bundle = json_to_stix_translator.convert_to_stix(
+            data_source, map_data, [sample_splunk_data_x_oca], get_module_transformers(MODULE), options,
+            callback=hash_type_lookup)
+
+        assert (result_bundle['type'] == 'bundle')
+        result_bundle_objects = result_bundle['objects']
+        observed_data = result_bundle_objects[1]
+
+        # validated_result = validate_instance(observed_data)
+        # assert(validated_result.is_valid is True)
+
+        self.assertTrue('objects' in observed_data, "non-empty objects is expected")
+        objects = observed_data['objects']
+        object_vals = objects.values()
+
+        x_oca_event = TestTransform.get_first_of_type(object_vals, 'x-oca-event')
+
+        network_ref = x_oca_event.get("network_ref")
+        self.assertIsNotNone(network_ref)
+        network_ref_obj = objects.get(network_ref)
+        self.assertIsNotNone(network_ref_obj)
+        self.assertEqual(56109, network_ref_obj['src_port'])
+        self.assertEqual(9389, network_ref_obj['dst_port'])
+
+        src_ip_obj = objects[network_ref_obj['src_ref']]
+        dst_ip_obj = objects[network_ref_obj['dst_ref']]
+
+        self.assertEqual("ipv4-addr", src_ip_obj['type'])
+        self.assertEqual("ipv4-addr", dst_ip_obj['type'])
+
+        self.assertEqual(src_ip_obj['value'], '123.123.123.123')
+        self.assertEqual(dst_ip_obj['value'], '1.1.1.1')
+
+    def test_x_oca_event_file_ref(self):
+        result_bundle = json_to_stix_translator.convert_to_stix(
+            data_source, map_data, [sample_splunk_data_x_oca], get_module_transformers(MODULE), options,
+            callback=hash_type_lookup)
+
+        assert (result_bundle['type'] == 'bundle')
+        result_bundle_objects = result_bundle['objects']
+        observed_data = result_bundle_objects[1]
+
+        # validated_result = validate_instance(observed_data)
+        # assert(validated_result.is_valid is True)
+
+        self.assertTrue('objects' in observed_data, "non-empty objects is expected")
+        objects = observed_data['objects']
+        object_vals = objects.values()
+
+        x_oca_event = TestTransform.get_first_of_type(object_vals, 'x-oca-event')
+
+        file_ref = x_oca_event.get("file_ref")
+        self.assertIsNotNone(file_ref)
+        file_ref_obj = objects.get(file_ref)
+        self.assertIsNotNone(file_ref_obj)
+        self.assertEqual("file", file_ref_obj['type'])
+        self.assertEqual("powershell.exe", file_ref_obj['name'])
+        parent_directory_obj = objects[file_ref_obj['parent_directory_ref']]
+        self.assertEqual("directory", parent_directory_obj['type'])
+        self.assertEqual("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", parent_directory_obj['path'])
+
+    def test_x_oca_asset(self):
+        result_bundle = json_to_stix_translator.convert_to_stix(
+            data_source, map_data, [sample_splunk_data_x_oca], get_module_transformers(MODULE), options,
+            callback=hash_type_lookup)
+
+        assert (result_bundle['type'] == 'bundle')
+        result_bundle_objects = result_bundle['objects']
+        observed_data = result_bundle_objects[1]
+
+        # validated_result = validate_instance(observed_data)
+        # assert(validated_result.is_valid is True)
+
+        assert ('objects' in observed_data)
+        objects = observed_data['objects']
+        object_vals = objects.values()
+
         x_oca_asset = TestTransform.get_first_of_type(object_vals, 'x-oca-asset')
         self.assertEqual(x_oca_asset['hostname'], 'WIN01')
-

@@ -214,7 +214,7 @@ class TestStixToSpl(unittest.TestCase, object):
         _test_query_assertions(query, queries)
 
     def test_event_query(self):
-        stix_pattern = "[x-ibm-event:code = 1]"
+        stix_pattern = "[x-oca-event:code = 1]"
         query = translation.translate('splunk', 'query', '{}', stix_pattern)
         queries = f'search (signature_id = 1) earliest="-5minutes" | head 10000 | fields {fields}'
         _test_query_assertions(query, queries)
