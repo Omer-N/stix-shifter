@@ -582,3 +582,54 @@ class TestTransform(unittest.TestCase, object):
             assert(objects[event_obj[key]] == obj)
         assert(objects.keys() == set(map(str, range(0, 10))))
 
+    def test_x_oca(self):
+        data = {
+            "src_ip": "9.148.244.42",
+            "src_port": "56109",
+            "dest_ip": "9.148.3.121",
+            "dest_port": "9389",
+            "user": "SYSTEM",
+            "protocol": "-",
+            "process_id": "912",
+            "process_name": "powershell.exe",
+            "process_exec": "powershell.exe",
+            "process_path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+            "host": "WIN01",
+            "source": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+            "signature": "Network Connect",
+            "signature_id": "3",
+            "_bkt": "main~13~01865622-E388-4D42-93EA-81D878D7EE08",
+            "_cd": "13:783766",
+            "_indextime": "1611052433",
+            "_kv": "1",
+            "_raw": "<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System><Provider Name='Microsoft-Windows-Sysmon' Guid='{5770385f-c22a-43e0-bf4c-06f5698ffbd9}'/><EventID>3</EventID><Version>5</Version><Level>4</Level><Task>3</Task><Opcode>0</Opcode><Keywords>0x8000000000000000</Keywords><TimeCreated SystemTime='2021-01-19T10:33:52.194972300Z'/><EventRecordID>528438</EventRecordID><Correlation/><Execution ProcessID='3252' ThreadID='4460'/><Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>win01.sl.cloud9.ibm.com</Computer><Security UserID='S-1-5-18'/></System><EventData><Data Name='RuleName'>-</Data><Data Name='UtcTime'>2021-01-19 10:33:52.142</Data><Data Name='ProcessGuid'>{077e539d-b586-6006-ca2e-000000001b00}</Data><Data Name='ProcessId'>912</Data><Data Name='Image'>C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe</Data><Data Name='User'>NT AUTHORITY\\SYSTEM</Data><Data Name='Protocol'>tcp</Data><Data Name='Initiated'>true</Data><Data Name='SourceIsIpv6'>false</Data><Data Name='SourceIp'>9.148.244.42</Data><Data Name='SourceHostname'>win01.sl.cloud9.ibm.com</Data><Data Name='SourcePort'>56109</Data><Data Name='SourcePortName'>-</Data><Data Name='DestinationIsIpv6'>false</Data><Data Name='DestinationIp'>9.148.3.121</Data><Data Name='DestinationHostname'>haifadc02.haifa.ibm.com</Data><Data Name='DestinationPort'>9389</Data><Data Name='DestinationPortName'>-</Data></EventData></Event>",
+            "_serial": "3",
+            "_si": [
+                "bgu-farsight2",
+                "main"
+            ],
+            "_sourcetype": "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational",
+            "_time": "2021-01-19T12:33:52.000+02:00"
+        }
+
+        result_bundle = json_to_stix_translator.convert_to_stix(
+            data_source, map_data, [data], get_module_transformers(MODULE), options, callback=hash_type_lookup)
+
+        assert(result_bundle['type'] == 'bundle')
+        result_bundle_objects = result_bundle['objects']
+        observed_data = result_bundle_objects[1]
+
+        # validated_result = validate_instance(observed_data)
+        # assert(validated_result.is_valid is True)
+
+        assert('objects' in observed_data)
+        objects = observed_data['objects']
+        object_vals = objects.values()
+
+        x_oca_event = TestTransform.get_first_of_type(object_vals, 'x-oca-event')
+        self.assertEqual(x_oca_event['module'], 'XmlWinEventLog:Microsoft-Windows-Sysmon/Operational')
+        self.assertEqual(x_oca_event['action'], 'Network Connect')
+        self.assertEqual(x_oca_event['code'], '3')
+        x_oca_asset = TestTransform.get_first_of_type(object_vals, 'x-oca-asset')
+        self.assertEqual(x_oca_asset['hostname'], 'WIN01')
+

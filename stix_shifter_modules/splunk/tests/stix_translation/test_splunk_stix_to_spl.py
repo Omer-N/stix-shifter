@@ -30,7 +30,7 @@ translation = stix_translation.StixTranslation()
 fields = ", ".join([
     "src_ip", "src_port", "src_mac", "src_ipv6", "dest_ip", "dest_port", "dest_mac", "dest_ipv6", "file_hash", "user",
     "url", "protocol", "process", "process_id", "process_name", "process_exec", "process_path", "process_hash",
-    "parent_process", "parent_process_id", "parent_process_name", "parent_process_exec", "host", "app", "description",
+    "parent_process", "parent_process_id", "parent_process_name", "parent_process_exec", "host", "source", "description",
     "result", "signature", "signature_id", "query", "answer"
 ])
 
@@ -136,7 +136,8 @@ class TestStixToSpl(unittest.TestCase, object):
                 key = key.upper()
             stix_pattern = "[network-traffic:protocols[*] = '" + key + "']"
             query = translation.translate('splunk', 'query', '{}', stix_pattern)
-        queries = 'search (protocol = "'+key+'") earliest="{}" | head {} | fields {}'.format(default_time_range_spl, DEFAULT_LIMIT, fields)
+        queries = 'search (protocol = "' + key + '") earliest="{}" | head {} | fields {}'.format(default_time_range_spl,
+                                                                                                 DEFAULT_LIMIT, fields)
         _test_query_assertions(query, queries)
 
     def test_network_traffic_start_stop(self):
@@ -217,3 +218,23 @@ class TestStixToSpl(unittest.TestCase, object):
         query = translation.translate('splunk', 'query', '{}', stix_pattern)
         queries = f'search (signature_id = 1) earliest="-5minutes" | head 10000 | fields {fields}'
         _test_query_assertions(query, queries)
+
+    def test_x_oca_asset_by_hostname(self):
+        stix_pattern = "[x-oca-asset:hostname = 'omer']"
+        result_query = translation.translate('splunk', 'query', '{}', stix_pattern)
+        expected_query = f'search (host = "omer") earliest="-5minutes" | head 10000 | fields {fields}'
+        _test_query_assertions(result_query, expected_query)
+
+    def test_x_oca_event(self):
+        stix_pattern = "[(x-oca-event:action = 'DNS Query' OR x-oca-event:code = 22) AND (x-oca-event:module = 'XmlWinEventLog:Microsoft-Windows-Sysmon/Operational')]"
+        result_query = translation.translate('splunk', 'query', '{}', stix_pattern)
+        expected_queries = f'search ((source = "XmlWinEventLog:Microsoft-Windows-Sysmon/Operational") AND ((signature_id = 22) OR (signature = "DNS Query"))) earliest="-5minutes" | head 10000 | fields {fields}'
+        _test_query_assertions(result_query, expected_queries)
+
+    def test_x_oca_event_missing_vals(self):
+        stix_pattern = "[(x-oca-event:action = '' OR x-oca-event:code = '') AND (x-oca-event:module = '')]"
+        result_query = translation.translate('splunk', 'query', '{}', stix_pattern)
+        print(result_query)
+        expected_queries = f'search ((source = "") AND ((signature_id = "") OR (signature = ""))) earliest="-5minutes" | head 10000 | fields {fields}'
+        _test_query_assertions(result_query, expected_queries)
+
