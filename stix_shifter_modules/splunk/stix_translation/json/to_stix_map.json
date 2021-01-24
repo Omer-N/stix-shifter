@@ -39,7 +39,7 @@
       "group": true
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -74,7 +74,7 @@
       "group": true
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -93,7 +93,7 @@
       "transformer": "ToInteger"
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -112,7 +112,7 @@
       "transformer": "ToInteger"
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -131,7 +131,7 @@
       "transformer": "ToLowercaseArray"
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -528,7 +528,7 @@
       "references": "domain"
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
@@ -554,7 +554,7 @@
       "group": true
     },
     {
-      "key": "x-ibm-event.network_ref",
+      "key": "x-oca-event.network_ref",
       "object": "event",
       "references": "network-traffic"
     },
