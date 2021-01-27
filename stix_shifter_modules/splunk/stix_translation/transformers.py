@@ -42,6 +42,8 @@ class SplunkHash(ValueTransformer):
         # expected to be string
         if obj:
             hashes = str(obj).split(",")
+            if len(hashes) == 1 and '=' not in hashes[0]:
+                return obj
             hashes = dict(map(lambda x: get_pair_of_hash(x), hashes))
             # print(hashes)
             return hashes
